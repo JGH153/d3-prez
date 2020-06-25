@@ -28,18 +28,30 @@ const arcPath = d3
 
 // console.log(arcPath(angles[0])); //M9.184850993605149e-15,-150A150,150,0,1,1,9.184850993605149e-15,150LNaN,NaNZ
 
+const color = d3.scaleOrdinal(d3.schemeSet3);
+console.log("d3", d3);
+
 // update function
 const update = (data) => {
-  
-	console.log(data);
-	// join enhanced (pie) data to path elements
-	const paths = graph.selectAll('path').data(pie(data));
 
-	// paths.enter() is a for each map
-	paths.enter().append('path').attr('class', 'arc').attr('d', arcPath).attr('stroke', '#fff').attr('stroke-width', 3)
+	// update the color scale domain
+	color.domain(data.map(current => current.name))
 
-	console.log(paths.enter());
+  console.log(data);
+  // join enhanced (pie) data to path elements
+  const paths = graph.selectAll("path").data(pie(data));
 
+  // paths.enter() is a for each map
+  paths
+    .enter()
+    .append("path")
+    .attr("class", "arc")
+    .attr("d", arcPath)
+    .attr("stroke", "#fff")
+		.attr("stroke-width", 3)
+		.attr('fill', current => color(current.data.name) )
+
+  console.log(paths.enter());
 };
 
 const data = [];
