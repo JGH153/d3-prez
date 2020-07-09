@@ -40,20 +40,26 @@ const update = (data) => {
   const paths = graph.selectAll("path").data(pie(data));
 
   // 3 remove exit selection
-  paths.exit().remove();
+  paths.exit().transition().duration(750).attrTween("d", arcTweenExit).remove();
 
   // update existing
-  paths.attr("d", arcPath).attr("fill", (current) => color(current.data.name));
+  paths.transition().duration(750).attrTween("d", arcTweenUpdate);
 
   // paths.enter() is a for each map
   paths
     .enter()
     .append("path")
     .attr("class", "arc")
-    .attr("d", arcPath)
     .attr("stroke", "#fff")
     .attr("stroke-width", 3)
-    .attr("fill", (current) => color(current.data.name));
+    .attr('d', arcPath)
+    .attr("fill", (current) => color(current.data.name))
+    .each(function (current) {
+      this._current = current;
+    })
+    .transition()
+    .duration(750)
+    .attrTween("d", arcTweenEnter);
 };
 
 const data = [];
@@ -75,3 +81,38 @@ db.collection("expenses")
     });
     update(data);
   });
+
+const arcTweenEnter = (element) => {
+  let interpolate = d3.interpolate(element.endAngle - 0.1, element.startAngle);
+  console.log(element);
+
+  // what is t? time?
+  return function (t) {
+    element.startAngle = interpolate(t);
+    return arcPath(element);
+  };
+};
+
+const arcTweenExit = (element) => {
+  let interpolate = d3.interpolate(element.startAngle, element.endAngle);
+
+  // what is t? time?
+  return function (t) {
+    element.startAngle = interpolate(t);
+    return arcPath(element);
+  };
+};
+
+// use function keyword to allow use of 'this'
+function arcTweenUpdate(element) {
+  console.log(this._current, element);
+  // interpolate between the two objects
+  let i = d3.interpolate(this._current, element);
+  // update the current prop with new updated data
+  this.current = i(1);
+
+  return function (timeTick) {
+    // i(t) returns a value of d (data object) which we pass to arcPath
+    return arcPath(i(timeTick));
+  };
+}
