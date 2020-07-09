@@ -84,7 +84,6 @@ db.collection("expenses")
 
 const arcTweenEnter = (element) => {
   let interpolate = d3.interpolate(element.endAngle - 0.1, element.startAngle);
-  console.log(element);
 
   // what is t? time?
   return function (t) {
@@ -107,12 +106,12 @@ const arcTweenExit = (element) => {
 function arcTweenUpdate(element) {
   console.log(this._current, element);
   // interpolate between the two objects
-  let i = d3.interpolate(this._current, element);
+  let interpolate = d3.interpolate(this._current, element);
   // update the current prop with new updated data
-  this.current = i(1);
+  this._current = interpolate(1);
 
   return function (timeTick) {
     // i(t) returns a value of d (data object) which we pass to arcPath
-    return arcPath(i(timeTick));
+    return arcPath(interpolate(timeTick));
   };
 }
