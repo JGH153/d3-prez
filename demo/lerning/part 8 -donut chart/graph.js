@@ -31,10 +31,21 @@ const arcPath = d3
 const color = d3.scaleOrdinal(d3.schemeSet3);
 // console.log("d3", d3);
 
+//legend setup
+const legendGroup = svg
+  .append("g")
+  .attr("transform", `translate(${dimensions.width + 40} 10)`);
+
+const legend = d3.legendColor().shape("circle").shapePadding(10).scale(color);
+
 // update function
 const update = (data) => {
   // update the color scale domain
   color.domain(data.map((current) => current.name));
+
+  // update and call legend
+  legendGroup.call(legend);
+  legendGroup.selectAll("text").attr("fill", "white");
 
   // join enhanced (pie) data to path elements
   const paths = graph.selectAll("path").data(pie(data));
@@ -52,7 +63,7 @@ const update = (data) => {
     .attr("class", "arc")
     .attr("stroke", "#fff")
     .attr("stroke-width", 3)
-    .attr('d', arcPath)
+    .attr("d", arcPath)
     .attr("fill", (current) => color(current.data.name))
     .each(function (current) {
       this._current = current;
