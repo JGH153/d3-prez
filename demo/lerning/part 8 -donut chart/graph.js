@@ -104,10 +104,9 @@ const arcTweenExit = (element) => {
 
 // use function keyword to allow use of 'this'
 function arcTweenUpdate(element) {
-  console.log(this._current, element);
   // interpolate between the two objects
   let interpolate = d3.interpolate(this._current, element);
-  // update the current prop with new updated data
+  // update the current prop with new updated data (reset to initial?)
   this._current = interpolate(1);
 
   return function (timeTick) {
